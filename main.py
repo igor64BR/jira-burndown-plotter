@@ -1,5 +1,4 @@
 from jira import JIRA
-import matplotlib.pyplot as plt
 import json
 from datetime import date
 import time
@@ -30,17 +29,29 @@ def save_data():
     with open('data.json', 'r') as f:
         data = json.load(f)
 
-    new_line = {str(date.today()): dict_estados}
+    today = str(date.today())
+
+    # remove_todays_old_registers(data, today)
+    data['data'] = [reg for reg in data['data'] if today not in reg]
+
+    new_line = {today: dict_estados}
+
     data["data"].append(new_line)
 
     with open('data.json', 'w') as f:
         json.dump(data, f)
 
 
-today = date.today()
+def online_main():
+    while True:
+        ONE_DAY_IN_SECONDS = 24 * 60 * 60
 
-while True:
-    ONE_DAY_IN_SECONDS = 24 * 60 * 60
+        save_data()
+        time.sleep(ONE_DAY_IN_SECONDS)
 
-    save_data()
-    time.sleep(ONE_DAY_IN_SECONDS)
+
+# run once
+save_data()
+
+# # run on server
+# online_main()
