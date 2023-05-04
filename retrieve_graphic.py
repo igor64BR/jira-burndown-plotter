@@ -1,27 +1,27 @@
 import json
 import matplotlib.pyplot as plt
-from datetime import datetime
-import ast
 
-with open('data.json') as f:
+# Load data from JSON file
+with open('data.json', 'r') as f:
     data = json.load(f)
 
-# prepare data for plotting
-x = []
-y = {}
+# Extract dates and values
+dates = []
+values = {}
 for item in data['data']:
-    date_str = list(item.keys())[0]
-    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-    x.append(date_obj)
-    for status, value in ast.literal_eval(item[date_str]).items():
-        if status not in y:
-            y[status] = []
-        y[status].append(value)
+    for date, value in item.items():
+        dates.append(date)
+        value_dict = json.loads(value)
+        for k in ['To Do', 'Done', 'In Progress', 'HOLD']:
+            if k not in values:
+                values[k] = []
+            values[k].append(value_dict.get(k, 0))
 
-# plot data
-plt.figure(figsize=(10, 5))
-for status in y:
-    plt.plot(x, y[status], label=status)
+# Plot line graph
+for k, v in values.items():
+    plt.plot(dates, v, label=k)
 
 plt.legend()
+plt.grid()
+plt.xticks(rotation=45)
 plt.show()
